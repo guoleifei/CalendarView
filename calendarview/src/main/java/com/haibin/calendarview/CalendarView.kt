@@ -176,7 +176,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
                     return
                 }
                 mDelegate.mSelectedCalendar = calendar
-                mWeekPager!!.updateSelected(mDelegate.mSelectedCalendar, false)
+                mWeekPager!!.updateSelected(mDelegate.mSelectedCalendar!!, false)
                 mMonthPager!!.updateSelected()
                 if (mWeekBar != null) {
                     mWeekBar!!.onDateSelected(calendar, isClick)
@@ -196,20 +196,20 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
 
         mDelegate.mSelectedCalendar = mDelegate.createCurrentDate()
-        mWeekBar!!.onDateSelected(mDelegate.mSelectedCalendar, false)
+        mWeekBar!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
 
         val mCurYear = mDelegate.mSelectedCalendar!!.year
         mMonthPager!!.setup(mDelegate)
         mMonthPager!!.setCurrentItem(mDelegate.mCurrentMonthViewItem)
-        mSelectLayout!!.setOnMonthSelectedListener(object : YearRecyclerView.OnMonthSelectedListener() {
-            fun onMonthSelected(year: Int, month: Int) {
+        mSelectLayout!!.setOnMonthSelectedListener(object : YearRecyclerView.OnMonthSelectedListener {
+            override fun onMonthSelected(year: Int, month: Int) {
                 val position = 12 * (year - mDelegate.minYear) + month - mDelegate.minYearMonth
                 mDelegate.isShowYearSelectedLayout = false
                 closeSelectLayout(position)
             }
         })
         mSelectLayout!!.setup(mDelegate)
-        mWeekPager!!.updateSelected(mDelegate.mSelectedCalendar, false)
+        mWeekPager!!.updateSelected(mDelegate.mSelectedCalendar!!, false)
     }
 
     /**
@@ -268,7 +268,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
             mParentLayout!!.hideContentView()
         }
         mWeekBar!!.animate()
-                .translationY(-mWeekBar!!.getHeight())
+                .translationY((-mWeekBar!!.getHeight()).toFloat())
                 .setInterpolator(LinearInterpolator())
                 .setDuration(260)
                 .setListener(object : AnimatorListenerAdapter() {
@@ -284,8 +284,8 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 })
 
         mMonthPager!!.animate()
-                .scaleX(0)
-                .scaleY(0)
+                .scaleX(0f)
+                .scaleY(0f)
                 .setDuration(260)
                 .setInterpolator(LinearInterpolator())
                 .setListener(object : AnimatorListenerAdapter() {
@@ -313,13 +313,13 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         mWeekBar!!.setVisibility(View.VISIBLE)
         if (position == mMonthPager!!.getCurrentItem()) {
             if (mDelegate.mDateSelectedListener != null) {
-                mDelegate.mDateSelectedListener!!.onDateSelected(mDelegate.mSelectedCalendar, false)
+                mDelegate.mDateSelectedListener!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
             }
         } else {
             mMonthPager!!.setCurrentItem(position, false)
         }
         mWeekBar!!.animate()
-                .translationY(0)
+                .translationY(0f)
                 .setInterpolator(LinearInterpolator())
                 .setDuration(280)
                 .setListener(object : AnimatorListenerAdapter() {
@@ -329,8 +329,8 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
                     }
                 })
         mMonthPager!!.animate()
-                .scaleX(1)
-                .scaleY(1)
+                .scaleX(1f)
+                .scaleY(1f)
                 .setDuration(180)
                 .setInterpolator(LinearInterpolator())
                 .setListener(object : AnimatorListenerAdapter() {
@@ -356,7 +356,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
             return
         }
         mDelegate.mSelectedCalendar = mDelegate.createCurrentDate()
-        mWeekBar!!.onDateSelected(mDelegate.mSelectedCalendar, false)
+        mWeekBar!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
         mWeekPager!!.scrollToCurrent(smoothScroll)
         mMonthPager!!.scrollToCurrent(smoothScroll)
         mSelectLayout!!.scrollToYear(mDelegate.currentDay!!.year, smoothScroll)
@@ -481,7 +481,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
             if (!Util.isCalendarInRange(mDelegate.mSelectedCalendar!!, mDelegate)) {
                 return
             }
-            mDelegate.mDateSelectedListener!!.onDateSelected(mDelegate.mSelectedCalendar, false)
+            mDelegate.mDateSelectedListener!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
         }
     }
 
@@ -516,7 +516,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      *
      * @param mSchemeDate mSchemeDate 通过自己的需求转换即可
      */
-    fun setSchemeDate(mSchemeDate: List<Calendar>) {
+    fun setSchemeDate(mSchemeDate: MutableList<Calendar>) {
         this.mDelegate.mSchemeDate = mSchemeDate
         mMonthPager!!.updateScheme()
         mWeekPager!!.updateScheme()

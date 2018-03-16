@@ -25,7 +25,7 @@ import android.widget.TextView
  * 星期栏，如果你要使用星期栏自定义，切记XML使用 merge，不要使用LinearLayout
  * Created by huanghaibin on 2017/11/30.
  */
-class WeekBar(context: Context) : LinearLayout(context) {
+open class WeekBar(context: Context) : LinearLayout(context) {
     private var mDelegate: CustomCalendarViewDelegate? = null
 
     init {
@@ -39,7 +39,7 @@ class WeekBar(context: Context) : LinearLayout(context) {
      *
      * @param delegate delegate
      */
-    internal fun setup(delegate: CustomCalendarViewDelegate) {
+     fun setup(delegate: CustomCalendarViewDelegate) {
         this.mDelegate = delegate
         if ("com.haibin.calendarview.WeekBar".equals(javaClass.name, ignoreCase = true)) {
             setTextColor(delegate.weekTextColor)
@@ -53,7 +53,7 @@ class WeekBar(context: Context) : LinearLayout(context) {
      *
      * @param color color
      */
-    internal fun setTextColor(color: Int) {
+     fun setTextColor(color: Int) {
         for (i in 0 until childCount) {
             (getChildAt(i) as TextView).setTextColor(color)
         }
@@ -66,7 +66,7 @@ class WeekBar(context: Context) : LinearLayout(context) {
      * @param calendar calendar 选择的日期
      * @param isClick  isClick 点击
      */
-     fun onDateSelected(calendar: Calendar, isClick: Boolean) {
+    open fun onDateSelected(calendar: Calendar, isClick: Boolean) {
 
     }
 

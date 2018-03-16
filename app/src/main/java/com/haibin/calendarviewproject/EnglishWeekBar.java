@@ -23,7 +23,7 @@ public class EnglishWeekBar extends WeekBar {
     }
 
     @Override
-    protected void onDateSelected(Calendar calendar, boolean isClick) {
+    public void onDateSelected(Calendar calendar, boolean isClick) {
         getChildAt(mPreSelectedIndex).setSelected(false);
         getChildAt(calendar.getWeek()).setSelected(true);
         mPreSelectedIndex = calendar.getWeek();

@@ -106,12 +106,12 @@ abstract class BaseView @JvmOverloads constructor(context: Context, attrs: Attri
     /**
      * 每一项的高度
      */
-    protected var mItemHeight: Int = 0
+    var mItemHeight: Int = 0
 
     /**
      * 每一项的宽度
      */
-     protected var mItemWidth: Int = 0
+    var mItemWidth: Int = 0
 
     /**
      * Text的基线
@@ -305,7 +305,7 @@ abstract class BaseView @JvmOverloads constructor(context: Context, attrs: Attri
      * @return true or false
      */
     protected fun isSelected(calendar: Calendar): Boolean {
-       return mItems?.indexOf(calendar) == mCurrentItem
+        return mItems?.indexOf(calendar) == mCurrentItem
 //        return mItems != null && mItems!!.indexOf(calendar) == mCurrentItem
     }
 

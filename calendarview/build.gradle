@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     buildToolsVersion '27.0.3'
@@ -25,14 +26,18 @@ android {
             abortOnError false
         }
     }
-    task intoJar(type: Copy) {
-        delete 'build/libs/CalendarView.jar'
-        from('build/intermediates/bundles/release/')
-        into('build/libs/')
-        include('classes.jar')
-        rename ('classes.jar', 'CalendarView.jar')
-    }
-    intoJar.dependsOn(build)
+//    task intoJar(type: Copy) {
+//        delete 'build/libs/CalendarView.jar'
+//        from('build/intermediates/bundles/release/')
+//        into('build/libs/')
+//        include('classes.jar')
+//        rename ('classes.jar', 'CalendarView.jar')
+//    }
+//    intoJar.dependsOn(build)
+}
+
+androidExtensions {
+    experimental = true
 }
 
 dependencies {
@@ -45,5 +50,8 @@ dependencies {
     //noinspection GradleDependency
     implementation 'com.android.support:recyclerview-v7:27.1.0'
     testImplementation 'junit:junit:4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
-apply from: '../script/gradle-jcenter-push.gradle'
+repositories {
+    mavenCentral()
+}
