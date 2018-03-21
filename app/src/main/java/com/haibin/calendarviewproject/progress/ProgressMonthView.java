@@ -34,22 +34,22 @@ public class ProgressMonthView extends MonthView {
 
     @Override
     protected void onPreviewHook() {
-        mRadius = Math.min(mItemWidth, mItemHeight) / 11 * 4;
+        mRadius = Math.min(getMItemWidth(), getMItemHeight()) / 11 * 4;
 
     }
 
     @Override
     protected boolean onDrawSelected(Canvas canvas, Calendar calendar, int x, int y, boolean hasScheme) {
-        int cx = x + mItemWidth / 2;
-        int cy = y + mItemHeight / 2;
-        canvas.drawCircle(cx, cy, mRadius, mSelectedPaint);
+        int cx = x + getMItemWidth() / 2;
+        int cy = y + getMItemHeight() / 2;
+        canvas.drawCircle(cx, cy, mRadius, getMSelectedPaint());
         return false;
     }
 
     @Override
     protected void onDrawScheme(Canvas canvas, Calendar calendar, int x, int y) {
-        int cx = x + mItemWidth / 2;
-        int cy = y + mItemHeight / 2;
+        int cx = x + getMItemWidth() / 2;
+        int cy = y + getMItemHeight() / 2;
 
         int angle = getAngle(Integer.parseInt(calendar.getScheme()));
 
@@ -63,25 +63,25 @@ public class ProgressMonthView extends MonthView {
 
     @Override
     protected void onDrawText(Canvas canvas, Calendar calendar, int x, int y, boolean hasScheme, boolean isSelected) {
-        float baselineY = mTextBaseLine + y;
-        int cx = x + mItemWidth / 2;
+        float baselineY = getMTextBaseLine() + y;
+        int cx = x + getMItemWidth() / 2;
 
         if (isSelected) {
             canvas.drawText(String.valueOf(calendar.getDay()),
                     cx,
                     baselineY,
-                    mSelectTextPaint);
+                    getMSelectTextPaint());
         } else if (hasScheme) {
             canvas.drawText(String.valueOf(calendar.getDay()),
                     cx,
                     baselineY,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mSchemeTextPaint : mOtherMonthTextPaint);
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMSchemeTextPaint() : getMOtherMonthTextPaint());
 
         } else {
             canvas.drawText(String.valueOf(calendar.getDay()), cx, baselineY,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mCurMonthTextPaint : mOtherMonthTextPaint);
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMCurMonthTextPaint() : getMOtherMonthTextPaint());
         }
     }
 

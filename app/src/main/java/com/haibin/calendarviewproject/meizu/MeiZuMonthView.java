@@ -58,8 +58,8 @@ public class MeiZuMonthView extends MonthView {
      */
     @Override
     protected boolean onDrawSelected(Canvas canvas, Calendar calendar, int x, int y, boolean hasScheme) {
-        mSelectedPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(x + mPadding, y + mPadding, x + mItemWidth - mPadding, y + mItemHeight - mPadding, mSelectedPaint);
+        getMSelectedPaint().setStyle(Paint.Style.FILL);
+        canvas.drawRect(x + mPadding, y + mPadding, x + getMItemWidth() - mPadding, y + getMItemHeight() - mPadding, getMSelectedPaint());
         return true;
     }
 
@@ -74,9 +74,9 @@ public class MeiZuMonthView extends MonthView {
     protected void onDrawScheme(Canvas canvas, Calendar calendar, int x, int y) {
         mSchemeBasicPaint.setColor(calendar.getSchemeColor());
 
-        canvas.drawCircle(x + mItemWidth - mPadding - mRadio / 2, y + mPadding + mRadio, mRadio, mSchemeBasicPaint);
+        canvas.drawCircle(x + getMItemWidth() - mPadding - mRadio / 2, y + mPadding + mRadio, mRadio, mSchemeBasicPaint);
 
-        canvas.drawText(calendar.getScheme(), x + mItemWidth - mPadding - mRadio, y + mPadding + mSchemeBaseLine, mTextPaint);
+        canvas.drawText(calendar.getScheme(), x + getMItemWidth() - mPadding - mRadio, y + mPadding + mSchemeBaseLine, mTextPaint);
     }
 
     /**
@@ -90,25 +90,25 @@ public class MeiZuMonthView extends MonthView {
      */
     @Override
     protected void onDrawText(Canvas canvas, Calendar calendar, int x, int y, boolean hasScheme, boolean isSelected) {
-        int cx = x + mItemWidth / 2;
-        int top = y - mItemHeight / 6;
+        int cx = x + getMItemWidth() / 2;
+        int top = y - getMItemHeight() / 6;
 
         if (isSelected) {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    mSelectTextPaint);
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10, mSelectedLunarTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    getMSelectTextPaint());
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + y + getMItemHeight() / 10, getMSelectedLunarTextPaint());
         } else if (hasScheme) {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    calendar.isCurrentMonth() ? mSchemeTextPaint : mOtherMonthTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    calendar.isCurrentMonth() ? getMSchemeTextPaint() : getMOtherMonthTextPaint());
 
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10, mCurMonthLunarTextPaint);
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + y + getMItemHeight() / 10, getMCurMonthLunarTextPaint());
         } else {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mCurMonthTextPaint : mOtherMonthTextPaint);
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10,
-                    calendar.isCurrentDay() ? mCurDayLunarTextPaint :
-                            calendar.isCurrentMonth() ? mCurMonthLunarTextPaint : mOtherMonthLunarTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMCurMonthTextPaint() : getMOtherMonthTextPaint());
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + y + getMItemHeight() / 10,
+                    calendar.isCurrentDay() ? getMCurDayLunarTextPaint() :
+                            calendar.isCurrentMonth() ? getMCurMonthLunarTextPaint() : getMOtherMonthLunarTextPaint());
         }
     }
 

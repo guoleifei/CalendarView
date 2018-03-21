@@ -131,9 +131,9 @@ class YearView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     private fun isScheme(day: Int): Boolean {
-        if (mSchemes == null || mSchemes!!.size == 0)
+        if (mSchemes == null || mSchemes?.isEmpty() != false)
             return false
-        mCalendar!!.day = day
-        return mSchemes!!.contains(mCalendar!!)
+        mCalendar?.day = day
+        return mSchemes?.contains(mCalendar!!)?:false
     }
 }

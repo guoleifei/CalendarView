@@ -19,7 +19,6 @@ package com.haibin.calendarview
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
-import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -48,17 +47,17 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
     /**
      * 自定义ViewPager，月视图
      */
-    internal var mMonthView: MonthViewPager? = null
+    private var mMonthView: MonthViewPager? = null
 
     /**
      * 自定义的周视图
      */
-    internal lateinit var mWeekPager: WeekViewPager
+    private lateinit var mWeekPager: WeekViewPager
 
     /**
      * 年视图
      */
-    internal var mYearView: YearSelectLayout? = null
+    private var mYearView: YearSelectLayout? = null
 
     /**
      * ContentView
@@ -98,7 +97,7 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
      * @return isExpand
      */
     val isExpand: Boolean
-        get() = mContentView == null || mMonthView!!.visibility === View.VISIBLE
+        get() = mContentView == null || mMonthView?.visibility == View.VISIBLE
 
     /**
      * ContentView是否滚动到顶部
@@ -106,7 +105,7 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
     private val isScrollTop: Boolean
         get() {
             if (mContentView is RecyclerView)
-                return (mContentView as RecyclerView).computeVerticalScrollOffset() === 0
+                return (mContentView as RecyclerView).computeVerticalScrollOffset() == 0
             if (mContentView is AbsListView) {
                 var result = false
                 val listView = mContentView as AbsListView?
@@ -116,7 +115,7 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
                 }
                 return result
             }
-            return mContentView!!.scrollY == 0
+            return mContentView?.scrollY == 0
         }
 
     init {
@@ -177,13 +176,13 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
         if (mDelegate == null)
             return
         val calendar = mDelegate!!.mSelectedCalendar
-        if (mDelegate!!.monthViewShowMode == CustomCalendarViewDelegate.MODE_ALL_MONTH) {
-            mContentViewTranslateY = 5 * mItemHeight
+        mContentViewTranslateY = if (mDelegate!!.monthViewShowMode == CustomCalendarViewDelegate.MODE_ALL_MONTH) {
+            5 * mItemHeight
         } else {
-            mContentViewTranslateY = Util.getMonthViewHeight(calendar!!.year, calendar.month, mItemHeight) - mItemHeight
+            Util.getMonthViewHeight(calendar!!.year, calendar.month, mItemHeight) - mItemHeight
         }
         //已经显示周视图，如果月视图高度是动态改变的，则需要动态平移contentView的高度
-        if (mWeekPager.getVisibility() === View.VISIBLE && mDelegate!!.monthViewShowMode != CustomCalendarViewDelegate.MODE_ALL_MONTH) {
+        if (mWeekPager.visibility == View.VISIBLE && mDelegate!!.monthViewShowMode != CustomCalendarViewDelegate.MODE_ALL_MONTH) {
             if (mContentView == null)
                 return
             mContentView!!.translationY = (-mContentViewTranslateY).toFloat()
@@ -239,7 +238,7 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
                 val velocityTracker = mVelocityTracker
                 velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity.toFloat())
                 val mYVelocity = velocityTracker.yVelocity
-                if (mContentView!!.translationY == 0f || mContentView!!.translationY == mContentViewTranslateY.toFloat()) {
+                if (mContentView?.translationY == 0f || mContentView!!.translationY == mContentViewTranslateY.toFloat()) {
 
                 } else {
                     if (Math.abs(mYVelocity) >= 800) {
@@ -272,7 +271,7 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
                     - Util.dipToPx(context, 1f))
             val heightSpec = View.MeasureSpec.makeMeasureSpec(h,
                     View.MeasureSpec.EXACTLY)
-            mContentView!!.measure(widthMeasureSpec, heightSpec)
+            mContentView?.measure(widthMeasureSpec, heightSpec)
         }
     }
 
@@ -294,10 +293,10 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
         }
         if (mYearView == null ||
                 mContentView == null ||
-                mContentView!!.visibility != View.VISIBLE) {
+                mContentView?.visibility != View.VISIBLE) {
             return super.onInterceptTouchEvent(ev)
         }
-        if (mYearView!!.getVisibility() === View.VISIBLE || mDelegate!!.isShowYearSelectedLayout) {
+        if (mYearView?.visibility == View.VISIBLE || mDelegate?.isShowYearSelectedLayout!!) {
             return super.onInterceptTouchEvent(ev)
         }
         val action = ev.action
@@ -349,7 +348,7 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
      */
     private fun translationViewPager() {
         val percent = mContentView!!.translationY * 1.0f / mContentViewTranslateY
-        mMonthView!!.setTranslationY(mViewPagerTranslateY * percent)
+        mMonthView?.translationY = mViewPagerTranslateY * percent
     }
 
     /**
@@ -358,28 +357,31 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
     fun expand(): Boolean {
         if (isAnimating || mCalendarShowMode == CALENDAR_SHOW_MODE_ONLY_WEEK_VIEW)
             return false
-        if (mMonthView!!.getVisibility() !== View.VISIBLE) {
-            mWeekPager.setVisibility(View.GONE)
-            mMonthView!!.setVisibility(View.VISIBLE)
+        if (mMonthView?.visibility != View.VISIBLE) {
+            mWeekPager.visibility = View.GONE
+            mMonthView?.visibility = View.VISIBLE
         }
-        val objectAnimator = ObjectAnimator.ofFloat(mContentView,
-                "translationY", mContentView!!.translationY, 0f)
-        objectAnimator.duration = 240
-        objectAnimator.addUpdateListener { animation ->
-            val currentValue = animation.animatedValue as Float
-            val percent = currentValue * 1.0f / mContentViewTranslateY
-            mMonthView!!.setTranslationY(mViewPagerTranslateY * percent)
-            isAnimating = true
-        }
-        objectAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                super.onAnimationEnd(animation)
-                isAnimating = false
-                hideWeek()
-
+        mContentView?.let {
+            val objectAnimator = ObjectAnimator.ofFloat(it,
+                    "translationY", it.translationY, 0f)
+            objectAnimator.duration = 240
+            objectAnimator.addUpdateListener { animation ->
+                val currentValue = animation.animatedValue as Float
+                val percent = currentValue * 1.0f / mContentViewTranslateY
+                mMonthView?.translationY = mViewPagerTranslateY * percent
+                isAnimating = true
             }
-        })
-        objectAnimator.start()
+            objectAnimator.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    isAnimating = false
+                    hideWeek()
+
+                }
+            })
+            objectAnimator.start()
+        }
+
         return true
     }
 
@@ -391,23 +393,26 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
         if (isAnimating) {
             return false
         }
-        val objectAnimator = ObjectAnimator.ofFloat(mContentView,"translationY", mContentView!!.translationY.toFloat(), -mContentViewTranslateY.toFloat())
-        objectAnimator.setDuration(240)
-        objectAnimator.addUpdateListener(AnimatorUpdateListener { animation ->
-            val currentValue = animation.animatedValue as Float
-            val percent = currentValue * 1.0f / mContentViewTranslateY
-            mMonthView!!.setTranslationY(mViewPagerTranslateY * percent)
-            isAnimating = true
-        })
-        objectAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                super.onAnimationEnd(animation)
-                isAnimating = false
-                showWeek()
+        mContentView?.let {
+            val objectAnimator = ObjectAnimator.ofFloat(it, "translationY", it.translationY, -mContentViewTranslateY.toFloat())
+            objectAnimator.duration = 240
+            objectAnimator.addUpdateListener({ animation ->
+                val currentValue = animation.animatedValue as Float
+                val percent = currentValue * 1.0f / mContentViewTranslateY
+                mMonthView?.translationY = mViewPagerTranslateY * percent
+                isAnimating = true
+            })
+            objectAnimator.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    isAnimating = false
+                    showWeek()
 
-            }
-        })
-        objectAnimator.start()
+                }
+            })
+            objectAnimator.start()
+        }
+
         return true
     }
 
@@ -420,24 +425,27 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
         }
         if ((mDefaultStatus == STATUS_SHRINK || mCalendarShowMode == CALENDAR_SHOW_MODE_ONLY_WEEK_VIEW) && mCalendarShowMode != CALENDAR_SHOW_MODE_ONLY_MONTH_VIEW) {
             post {
-                val objectAnimator = ObjectAnimator.ofFloat(mContentView,
-                        "translationY", mContentView!!.translationY, -mContentViewTranslateY.toFloat())
-                objectAnimator.setDuration(0)
-                objectAnimator.addUpdateListener(AnimatorUpdateListener { animation ->
-                    val currentValue = animation.animatedValue as Float
-                    val percent = currentValue * 1.0f / mContentViewTranslateY
-                    mMonthView!!.setTranslationY(mViewPagerTranslateY * percent)
-                    isAnimating = true
-                })
-                objectAnimator.addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        super.onAnimationEnd(animation)
-                        isAnimating = false
-                        showWeek()
+                mContentView?.let {
+                    val objectAnimator = ObjectAnimator.ofFloat(it,
+                            "translationY", it.translationY, -mContentViewTranslateY.toFloat())
+                    objectAnimator.duration = 0
+                    objectAnimator.addUpdateListener({ animation ->
+                        val currentValue = animation.animatedValue as Float
+                        val percent = currentValue * 1.0f / mContentViewTranslateY
+                        mMonthView?.translationY = mViewPagerTranslateY * percent
+                        isAnimating = true
+                    })
+                    objectAnimator.addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            super.onAnimationEnd(animation)
+                            isAnimating = false
+                            showWeek()
 
-                    }
-                })
-                objectAnimator.start()
+                        }
+                    })
+                    objectAnimator.start()
+                }
+
             }
         }
     }
@@ -446,17 +454,17 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
      * 隐藏周视图
      */
     private fun hideWeek() {
-        mWeekPager.setVisibility(View.GONE)
-        mMonthView!!.setVisibility(View.VISIBLE)
+        mWeekPager.visibility = View.GONE
+        mMonthView?.visibility = View.VISIBLE
     }
 
     /**
      * 显示周视图
      */
     private fun showWeek() {
-        mWeekPager.getAdapter()!!.notifyDataSetChanged()
-        mWeekPager.setVisibility(View.VISIBLE)
-        mMonthView!!.setVisibility(View.INVISIBLE)
+        mWeekPager.adapter?.notifyDataSetChanged()
+        mWeekPager.visibility = View.VISIBLE
+        mMonthView?.visibility = View.INVISIBLE
     }
 
 
@@ -464,38 +472,38 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
      * 隐藏内容布局
      */
     internal fun hideContentView() {
-        if (mContentView == null)
-            return
-        mContentView!!.animate()
-                .translationY((height - mMonthView!!.getHeight()).toFloat())
-                .setDuration(220)
-                .setInterpolator(LinearInterpolator())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        super.onAnimationEnd(animation)
-                        mContentView!!.visibility = View.INVISIBLE
-                        mContentView!!.clearAnimation()
-                    }
-                })
+        mContentView?.let {
+            it.animate()
+                    .translationY((height - mMonthView?.height!!).toFloat())
+                    .setDuration(220)
+                    .setInterpolator(LinearInterpolator())
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            super.onAnimationEnd(animation)
+                            it.visibility = View.INVISIBLE
+                            it.clearAnimation()
+                        }
+                    })
+        }
     }
 
     /**
      * 显示内容布局
      */
     internal fun showContentView() {
-        if (mContentView == null)
-            return
-        mContentView!!.translationY = (height - mMonthView!!.getHeight()).toFloat()
-        mContentView!!.visibility = View.VISIBLE
-        mContentView!!.animate()
-                .translationY(0f)
-                .setDuration(180)
-                .setInterpolator(LinearInterpolator())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        super.onAnimationEnd(animation)
-                    }
-                })
+        mContentView?.let {
+            it.translationY = (height - mMonthView?.height!!).toFloat()
+            it.visibility = View.VISIBLE
+            it.animate()
+                    .translationY(0f)
+                    .setDuration(180)
+                    .setInterpolator(LinearInterpolator())
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            super.onAnimationEnd(animation)
+                        }
+                    })
+        }
     }
 
     companion object {
@@ -503,27 +511,27 @@ class CalendarLayout(context: Context, attrs: AttributeSet) : LinearLayout(conte
         /**
          * 周月视图
          */
-        private val CALENDAR_SHOW_MODE_BOTH_MONTH_WEEK_VIEW = 0
+        private const val CALENDAR_SHOW_MODE_BOTH_MONTH_WEEK_VIEW = 0
 
 
         /**
          * 仅周视图
          */
-        private val CALENDAR_SHOW_MODE_ONLY_WEEK_VIEW = 1
+        private const val CALENDAR_SHOW_MODE_ONLY_WEEK_VIEW = 1
 
         /**
          * 仅月视图
          */
-        private val CALENDAR_SHOW_MODE_ONLY_MONTH_VIEW = 2
+        private const val CALENDAR_SHOW_MODE_ONLY_MONTH_VIEW = 2
 
         /**
          * 默认展开
          */
-        private val STATUS_EXPAND = 0
+        private const val STATUS_EXPAND = 0
 
         /**
          * 默认收缩
          */
-        private val STATUS_SHRINK = 1
+        private const val STATUS_SHRINK = 1
     }
 }

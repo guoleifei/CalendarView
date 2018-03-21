@@ -334,24 +334,24 @@ class CustomCalendarViewDelegate(context: Context, attrs: AttributeSet?) {
         /**
          * 全部显示
          */
-        val MODE_ALL_MONTH = 0
+        const val MODE_ALL_MONTH = 0
         /**
          * 仅显示当前月份
          */
-        val MODE_ONLY_CURRENT_MONTH = 1
+        const val MODE_ONLY_CURRENT_MONTH = 1
 
         /**
          * 自适应显示，不会多出一行，但是会自动填充
          */
-        val MODE_FIT_MONTH = 2
+        const val MODE_FIT_MONTH = 2
 
         /**
          * 支持转换的最小农历年份
          */
-        val MIN_YEAR = 1900
+        const val MIN_YEAR = 1900
         /**
          * 支持转换的最大农历年份
          */
-        private val MAX_YEAR = 2099
+        private const val MAX_YEAR = 2099
     }
 }

@@ -31,12 +31,12 @@ public class IndexWeekView extends WeekView {
 
     @Override
     protected void onPreviewHook() {
-        mCurMonthTextPaint.setTextSize(dipToPx(getContext(), 16));
-        mOtherMonthTextPaint.setTextSize(dipToPx(getContext(), 16));
-        mSchemeTextPaint.setTextSize(dipToPx(getContext(), 16));
-        mCurDayTextPaint.setTextSize(dipToPx(getContext(), 16));
-        mCurMonthLunarTextPaint.setTextSize(dipToPx(getContext(), 12));
-        mOtherMonthLunarTextPaint.setTextSize(dipToPx(getContext(), 12));
+        getMCurMonthTextPaint().setTextSize(dipToPx(getContext(), 16));
+        getMOtherMonthTextPaint().setTextSize(dipToPx(getContext(), 16));
+        getMSchemeTextPaint().setTextSize(dipToPx(getContext(), 16));
+        getMCurDayTextPaint().setTextSize(dipToPx(getContext(), 16));
+        getMCurMonthLunarTextPaint().setTextSize(dipToPx(getContext(), 12));
+        getMOtherMonthLunarTextPaint().setTextSize(dipToPx(getContext(), 12));
     }
 
     /**
@@ -51,8 +51,8 @@ public class IndexWeekView extends WeekView {
      */
     @Override
     protected boolean onDrawSelected(Canvas canvas, Calendar calendar, int x, boolean hasScheme) {
-        mSelectedPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(x + mPadding, mPadding, x + mItemWidth - mPadding, mItemHeight - mPadding, mSelectedPaint);
+        getMSelectedPaint().setStyle(Paint.Style.FILL);
+        canvas.drawRect(x + mPadding, mPadding, x + getMItemWidth() - mPadding, getMItemHeight() - mPadding, getMSelectedPaint());
         return true;
     }
 
@@ -66,26 +66,26 @@ public class IndexWeekView extends WeekView {
     @Override
     protected void onDrawScheme(Canvas canvas, Calendar calendar, int x) {
         mSchemeBasicPaint.setColor(calendar.getSchemeColor());
-        canvas.drawRect(x + mItemWidth / 2 - mW / 2,
-                mItemHeight - mH * 2 - mPadding,
-                x + mItemWidth / 2 + mW / 2,
-                mItemHeight - mH - mPadding, mSchemeBasicPaint);
+        canvas.drawRect(x + getMItemWidth() / 2 - mW / 2,
+                getMItemHeight() - mH * 2 - mPadding,
+                x + getMItemWidth() / 2 + mW / 2,
+                getMItemHeight() - mH - mPadding, mSchemeBasicPaint);
     }
 
     @Override
     protected void onDrawText(Canvas canvas, Calendar calendar, int x, boolean hasScheme, boolean isSelected) {
-        int cx = x + mItemWidth / 2;
-        int top = -mItemHeight / 6;
+        int cx = x + getMItemWidth() / 2;
+        int top = -getMItemHeight() / 6;
         if (hasScheme) {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mSchemeTextPaint : mCurMonthTextPaint);
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + mItemHeight / 10, mCurMonthLunarTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMSchemeTextPaint() : getMCurMonthTextPaint());
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + getMItemHeight() / 10, getMCurMonthLunarTextPaint());
         } else {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mCurMonthTextPaint : mCurMonthTextPaint);
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + mItemHeight / 10, mCurMonthLunarTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMCurMonthTextPaint() : getMCurMonthTextPaint());
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + getMItemHeight() / 10, getMCurMonthLunarTextPaint());
         }
     }
 

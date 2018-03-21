@@ -24,27 +24,27 @@ internal object LunarCalendar {
     /**
      * 农历月份第一天转写
      */
-    private lateinit var MONTH_STR: Array<String>
+    private var MONTH_STR: Array<String>? = null
 
     /**
      * 传统农历节日
      */
-    private lateinit var TRADITION_FESTIVAL_STR: Array<String>
+    private var TRADITION_FESTIVAL_STR: Array<String>? = null
 
     /**
      * 农历大写
      */
-    private lateinit var DAY_STR: Array<String>
+    private  var DAY_STR: Array<String>? = null
 
     /**
      * 公历节日
      */
-    private lateinit var SOLAR_CALENDAR: Array<String>
+    private var SOLAR_CALENDAR: Array<String>? = null
 
     /**
      * 保存每年24节气
      */
-    private val SOLAR_TERMS = ArrayMap<Int, Array<String>>()
+    private var SOLAR_TERMS = ArrayMap<Int, Array<String>>()
 
     /**
      * 用来表示1900年到2099年间农历年份的相关信息，共24位bit的16进制表示，其中：
@@ -81,7 +81,7 @@ internal object LunarCalendar {
 
 
     fun init(context: Context) {
-        if (!MONTH_STR.isEmpty()) {
+        if (MONTH_STR == null) {
             return
         }
         SolarTermUtil.init(context)
@@ -103,11 +103,11 @@ internal object LunarCalendar {
         if (month == 12) {
             val count = daysInLunarMonth(year, month)
             if (day == count) {
-                return TRADITION_FESTIVAL_STR[0]//除夕
+                return TRADITION_FESTIVAL_STR?.get(0) ?: ""//除夕
             }
         }
         val text = getString(month, day)
-        return TRADITION_FESTIVAL_STR.singleOrNull { it.contains(text) }?.replace(text, "") ?: ""
+        return TRADITION_FESTIVAL_STR?.singleOrNull { it.contains(text) }?.replace(text, "") ?: ""
     }
 
 
@@ -120,8 +120,8 @@ internal object LunarCalendar {
      */
     private fun numToChineseMonth(month: Int, leap: Int): String {
         return if (leap == 1) {
-            String.format("闰%s", MONTH_STR[month - 1])
-        } else MONTH_STR[month - 1]
+            String.format("闰%s", MONTH_STR?.get(month - 1))
+        } else MONTH_STR?.get(month - 1)?:""
     }
 
     /**
@@ -135,7 +135,7 @@ internal object LunarCalendar {
     private fun numToChinese(month: Int, day: Int, leap: Int): String {
         return if (day == 1) {
             numToChineseMonth(month, leap)
-        } else DAY_STR[day - 1]
+        } else DAY_STR?.get(day - 1)?:""
     }
 
 
@@ -162,7 +162,7 @@ internal object LunarCalendar {
      */
     private fun gregorianFestival(month: Int, day: Int): String {
         val text = getString(month, day)
-        return SOLAR_CALENDAR.singleOrNull { it.contains(text) }?.replace(text, "") ?: ""
+        return SOLAR_CALENDAR?.singleOrNull { it.contains(text) }?.replace(text, "") ?: ""
     }
 
     private fun getString(month: Int, day: Int): String {

@@ -77,9 +77,11 @@ class DefaultMonthView(context: Context) : MonthView(context) {
             }
             else -> {
                 canvas.drawText(calendar.day.toString(), cx.toFloat(), mTextBaseLine + top,
-                        if (calendar.isCurrentDay)
-                            mCurDayTextPaint
-                        else if (calendar.isCurrentMonth) mCurMonthTextPaint else mOtherMonthTextPaint)
+                        when {
+                            calendar.isCurrentDay -> mCurDayTextPaint
+                            calendar.isCurrentMonth -> mCurMonthTextPaint
+                            else -> mOtherMonthTextPaint
+                        })
                 canvas.drawText(calendar.lunar!!, cx.toFloat(), mTextBaseLine + y.toFloat() + (mItemHeight / 10).toFloat(),
                         when {
                             calendar.isCurrentDay -> mCurDayLunarTextPaint

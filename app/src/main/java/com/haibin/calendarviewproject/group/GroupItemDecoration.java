@@ -80,7 +80,7 @@ public class GroupItemDecoration<Group, Child> extends RecyclerView.ItemDecorati
                 c.drawRect(paddingLeft, top, right, bottom, mBackgroundPaint);
                 String group = mGroup.get(params.getViewLayoutPosition()).toString();
                 float x;
-                float y = top + mTextBaseLine;
+                float y = top +mTextBaseLine;
                 if (isCenter) {
                     x = parent.getMeasuredWidth() / 2 - getTextX(group);
                 } else {

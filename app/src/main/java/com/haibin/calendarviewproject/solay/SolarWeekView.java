@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.haibin.calendarview.Calendar;
+import com.haibin.calendarview.Scheme;
 import com.haibin.calendarview.WeekView;
 
 import java.util.List;
@@ -28,34 +29,34 @@ public class SolarWeekView extends WeekView {
 
         mPointPaint.setAntiAlias(true);
         mPointPaint.setStyle(Paint.Style.FILL);
-        mSchemePaint.setStyle(Paint.Style.STROKE);
-        mSchemePaint.setStrokeWidth(dipToPx(context, 1.2f));
-        mSchemePaint.setColor(0xFFFFFFFF);
+        getMSchemePaint().setStyle(Paint.Style.STROKE);
+        getMSchemePaint().setStrokeWidth(dipToPx(context, 1.2f));
+        getMSchemePaint().setColor(0xFFFFFFFF);
         mPointRadius = dipToPx(context, 3.6f);
         mPointPaint.setColor(Color.RED);
     }
 
     @Override
     protected void onPreviewHook() {
-        mRadius = Math.min(mItemWidth, mItemHeight) / 5 * 2;
+        mRadius = Math.min(getMItemWidth(), getMItemHeight()) / 5 * 2;
     }
 
 
     @Override
     protected boolean onDrawSelected(Canvas canvas, Calendar calendar, int x, boolean hasScheme) {
-        int cx = x + mItemWidth / 2;
-        int cy = mItemHeight / 2;
-        canvas.drawCircle(cx, cy, mRadius, mSelectedPaint);
+        int cx = x + getMItemWidth() / 2;
+        int cy = getMItemHeight() / 2;
+        canvas.drawCircle(cx, cy, mRadius, getMSelectedPaint());
         return false;
     }
 
     @Override
     protected void onDrawScheme(Canvas canvas, Calendar calendar, int x) {
-        int cx = x + mItemWidth / 2;
-        int cy = mItemHeight / 2;
-        canvas.drawCircle(cx, cy, mRadius, mSchemePaint);
+        int cx = x + getMItemWidth() / 2;
+        int cy = getMItemHeight() / 2;
+        canvas.drawCircle(cx, cy, mRadius, getMSchemePaint());
 
-        List<Calendar.Scheme> schemes = calendar.getSchemes();
+        List<Scheme> schemes = calendar.getSchemes();
 
         mPointPaint.setColor(schemes.get(0).getShcemeColor());//You can also use three fixed Paint 你也可以使用三个Paint对象
         int rightTopX = (int) (cx + mRadius * Math.cos(-10 * Math.PI / 180));
@@ -75,24 +76,24 @@ public class SolarWeekView extends WeekView {
 
     @Override
     protected void onDrawText(Canvas canvas, Calendar calendar, int x, boolean hasScheme, boolean isSelected) {
-        float baselineY = mTextBaseLine;
-        int cx = x + mItemWidth / 2;
+        float baselineY = getMTextBaseLine();
+        int cx = x + getMItemWidth() / 2;
         if (isSelected) {
             canvas.drawText(String.valueOf(calendar.getDay()),
                     cx,
                     baselineY,
-                    mSelectTextPaint);
+                    getMSelectTextPaint());
         } else if (hasScheme) {
             canvas.drawText(String.valueOf(calendar.getDay()),
                     cx,
                     baselineY,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mSchemeTextPaint : mSchemeTextPaint);
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMSchemeTextPaint() : getMSchemeTextPaint());
 
         } else {
             canvas.drawText(String.valueOf(calendar.getDay()), cx, baselineY,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mCurMonthTextPaint : mCurMonthTextPaint);
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMCurMonthTextPaint() : getMCurMonthTextPaint());
         }
     }
 

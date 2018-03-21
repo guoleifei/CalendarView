@@ -319,7 +319,7 @@ abstract class WeekView(context: Context) : BaseView(context) {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var heightMeasureSpecTemp = View.MeasureSpec.makeMeasureSpec(mItemHeight, View.MeasureSpec.EXACTLY)
+        val heightMeasureSpecTemp = View.MeasureSpec.makeMeasureSpec(mItemHeight, View.MeasureSpec.EXACTLY)
         super.onMeasure(widthMeasureSpec, heightMeasureSpecTemp)
     }
 

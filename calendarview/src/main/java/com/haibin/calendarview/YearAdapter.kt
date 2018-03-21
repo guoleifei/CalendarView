@@ -51,20 +51,18 @@ internal class YearAdapter(context: Context) : BaseRecyclerAdapter<Month>(contex
         view.setTextStyle(mDelegate!!.yearViewDayTextSize,
                 mDelegate!!.yearViewDayTextColor)
         view.init(item.diff, item.count, item.year, item.month)
-        view.getLayoutParams().height = mItemHeight - mTextHeight
+        view.layoutParams.height = mItemHeight - mTextHeight
         h.mTextMonth.text = String.format("%s月", item.month)
         h.mTextMonth.setTextSize(TypedValue.COMPLEX_UNIT_PX, mDelegate!!.yearViewMonthTextSize.toFloat())
         h.mTextMonth.setTextColor(mDelegate!!.yearViewMonthTextColor)
     }
 
     private class YearViewHolder internal constructor(itemView: View, delegate: CustomCalendarViewDelegate) : RecyclerView.ViewHolder(itemView) {
-        internal var mYearView: YearView
-        internal var mTextMonth: TextView
+        internal var mYearView: YearView = itemView.findViewById<View>(R.id.selectView) as YearView
+        internal var mTextMonth: TextView =itemView.findViewById<View>(R.id.tv_month) as TextView
 
         init {
-            mYearView = itemView.findViewById<View>(R.id.selectView) as YearView
             mYearView.setup(delegate)
-            mTextMonth = itemView.findViewById<View>(R.id.tv_month) as TextView
         }
     }
 }

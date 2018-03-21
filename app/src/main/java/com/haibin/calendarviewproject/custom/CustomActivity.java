@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarLayout;
 import com.haibin.calendarview.CalendarView;
+import com.haibin.calendarview.Scheme;
 import com.haibin.calendarviewproject.Article;
 import com.haibin.calendarviewproject.ArticleAdapter;
 import com.haibin.calendarviewproject.R;
@@ -143,7 +144,7 @@ public class CustomActivity extends BaseActivity implements
         calendar.setDay(day);
         calendar.setSchemeColor(color);//如果单独标记颜色、则会使用这个颜色
         calendar.setScheme(text);
-        calendar.addScheme(new Calendar.Scheme());
+        calendar.addScheme(new Scheme());
         calendar.addScheme(0xFF008800, "假");
         calendar.addScheme(0xFF008800, "节");
         return calendar;

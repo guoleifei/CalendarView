@@ -56,7 +56,7 @@ class YearSelectLayout @JvmOverloads constructor(context: Context, attrs: Attrib
 
             override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
                 if (`object` is YearRecyclerView)
-                    container.removeView(`object` as YearRecyclerView)
+                    container.removeView(`object`)
             }
         }
         currentItem = mDelegate!!.currentDay!!.year - mDelegate!!.minYear
@@ -73,10 +73,9 @@ class YearSelectLayout @JvmOverloads constructor(context: Context, attrs: Attrib
 
 
     internal fun update() {
-        for (i in 0 until childCount) {
-            val view = getChildAt(i) as YearRecyclerView
-            view.getAdapter().notifyDataSetChanged()
-        }
+        (0 until childCount)
+                .map { getChildAt(it) as YearRecyclerView }
+                .forEach { it.adapter.notifyDataSetChanged() }
     }
 
     fun setOnMonthSelectedListener(listener: YearRecyclerView.OnMonthSelectedListener) {
@@ -84,9 +83,8 @@ class YearSelectLayout @JvmOverloads constructor(context: Context, attrs: Attrib
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var heightMeasureSpec = heightMeasureSpec
-        heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(getHeight(context, this), View.MeasureSpec.EXACTLY)
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val heightMeasureSpecTemp = View.MeasureSpec.makeMeasureSpec(getHeight(context, this), View.MeasureSpec.EXACTLY)
+        super.onMeasure(widthMeasureSpec, heightMeasureSpecTemp)
     }
 
     /**

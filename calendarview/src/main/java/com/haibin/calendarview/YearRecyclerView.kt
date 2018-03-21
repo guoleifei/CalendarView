@@ -26,11 +26,10 @@ import android.view.View
  */
 class YearRecyclerView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : RecyclerView(context, attrs) {
     private var mDelegate: CustomCalendarViewDelegate? = null
-    private val mAdapter: YearAdapter
+    private val mAdapter: YearAdapter = YearAdapter(context)
     private var mListener: OnMonthSelectedListener? = null
 
     init {
-        mAdapter = YearAdapter(context)
         layoutManager = GridLayoutManager(context, 3)
         adapter = mAdapter
         mAdapter.setOnItemClickListener(object : BaseRecyclerAdapter.OnItemClickListener {

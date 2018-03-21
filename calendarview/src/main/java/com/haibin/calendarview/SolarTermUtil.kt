@@ -26,7 +26,7 @@ object SolarTermUtil {
     /**
      * 24节气
      */
-    private lateinit var SOLAR_TERMS: Array<String>
+    private var SOLAR_TERMS: Array<String>? = null
 
     /**
      * 每弧度的角秒数
@@ -456,34 +456,34 @@ object SolarTermUtil {
      * @return 已知位置反求时间
      */
     private fun getTimeFromAngle(t1: Double, angle: Double, lx: Int): Double {
-        var t1 = t1
-        var angle = angle
-        var t2 = t1
+        var t1Temp = t1
+        var angleTemp = angle
+        var t2 = t1Temp
         var t = 0.0
         var v: Double
         if (lx == 0)
             t2 += 360.0 // 在t1到t2范围内求解(范气360天范围),结果置于t
         else
             t2 += 25.0
-        angle *= Math.PI / 180 // 待搜索目标角
+        angleTemp *= Math.PI / 180 // 待搜索目标角
         // 利用截弦法计算
-        var v1 = angleDiff(lx, t1, angle) // v1,v2为t1,t2时对应的黄经
-        var v2 = angleDiff(lx, t2, angle)
+        var v1 = angleDiff(lx, t1Temp, angleTemp) // v1,v2为t1,t2时对应的黄经
+        var v2 = angleDiff(lx, t2, angleTemp)
         if (v1 < v2)
             v2 -= 2 * Math.PI // 减2pi作用是将周期性角度转为连续角度
         var k = 1.0
         var k2: Double // k是截弦的斜率
         for (i in 0..9) { // 快速截弦求根,通常截弦三四次就已达所需精度
-            k2 = (v2 - v1) / (t2 - t1) // 算出斜率
+            k2 = (v2 - v1) / (t2 - t1Temp) // 算出斜率
             if (Math.abs(k2) > 1e-15)
                 k = k2 // 差商可能为零,应排除
-            t = t1 - v1 / k
-            v = angleDiff(lx, t, angle)// 直线逼近法求根(直线方程的根)
+            t = t1Temp - v1 / k
+            v = angleDiff(lx, t, angleTemp)// 直线逼近法求根(直线方程的根)
             if (v > 1)
                 v -= 2 * Math.PI // 一次逼近后,v1就已接近0,如果很大,则应减1周
             if (Math.abs(v) < 1e-8)
                 break // 已达精度
-            t1 = t2
+            t1Temp = t2
             v1 = v2
             t2 = t
             v2 = v // 下一次截弦
@@ -499,7 +499,7 @@ object SolarTermUtil {
      * @return 24节气
      */
     fun getSolarTerms(year: Int): Array<String> {
-        val solarTerms = arrayListOf<String>()
+        val solarTerms = Array(24, { "" })
         val preOffset = getSolarTermsPreOffset(year - 1)
         val nextOffset = getSolarTermsNextOffset(year - 1)
         System.arraycopy(preOffset, 0, solarTerms, 0, preOffset.size)
@@ -510,11 +510,13 @@ object SolarTermUtil {
             q = getTimeFromAngle(jd + i * 15.2, (i * 15).toDouble(), 0)
             q += J2000 + 8.toDouble() / 24 // 计算第i个节气(i=0是春风),结果转为北京时
             val time = setFromJulian(q, true)
-            solarTerms[i + 3] = time.toString() + SOLAR_TERMS[i]
+            SOLAR_TERMS?.let {
+                solarTerms[i + 3] = time.toString() + it[i]
+            }
 
         }
 
-        return solarTerms.toTypedArray()
+        return solarTerms
     }
 
 
@@ -525,7 +527,7 @@ object SolarTermUtil {
      * @return 返回 立春 雨水 惊蛰
      */
     private fun getSolarTermsPreOffset(year: Int): Array<String> {
-        val solarTerms = arrayListOf<String>()
+        val solarTerms =  Array(3, { "" })
         val jd = 365.2422 * (year - 2000)
         var q: Double
         for (i in 21..23) {
@@ -533,9 +535,12 @@ object SolarTermUtil {
             // 计算第i个节气(i=0是春分)
             q += J2000 + 8.toDouble() / 24
             val time = setFromJulian(q, true)
-            solarTerms[i - 21] = time.toString() + SOLAR_TERMS!![i]
+            SOLAR_TERMS?.let {
+                solarTerms[i - 21] = time.toString() + it[i]
+            }
+
         }
-        return solarTerms.toTypedArray()
+        return solarTerms
     }
 
     /**
@@ -545,16 +550,20 @@ object SolarTermUtil {
      * @return 返回 小寒大寒
      */
     private fun getSolarTermsNextOffset(year: Int): Array<String> {
-        val solarTerms = arrayListOf<String>()
+        val solarTerms =  Array(2, { "" })
         val jd = 365.2422 * (year - 2000)
         var q: Double
         for (i in 19..20) {
             q = getTimeFromAngle(jd + i * 15.2, (i * 15).toDouble(), 0)
             q += J2000 + 8.toDouble() / 24 // 计算第i个节气(i=0是春分)
             val time = setFromJulian(q, true)
-            solarTerms[i - 19] = time.toString() + SOLAR_TERMS!![i]
+            SOLAR_TERMS?.let {
+                solarTerms[i - 19] = time.toString() + it[i]
+            }
+
+
         }
-        return solarTerms.toTypedArray()
+        return solarTerms
     }
 
     /**

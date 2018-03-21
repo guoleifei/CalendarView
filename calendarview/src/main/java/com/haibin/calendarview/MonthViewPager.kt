@@ -120,7 +120,7 @@ class MonthViewPager @JvmOverloads constructor(context: Context, attrs: Attribut
                     mDelegate!!.mDateSelectedListener!!.onDateSelected(mDelegate!!.mSelectedCalendar!!, false)
                 }
 
-                val view = findViewWithTag<View>(position) as MonthView
+                val view = findViewWithTag<View>(position) as? MonthView
                 if (view != null) {
                     val index = view.getSelectedIndex(mDelegate!!.mSelectedCalendar!!)
                     view.mCurrentItem = index
@@ -260,7 +260,9 @@ class MonthViewPager @JvmOverloads constructor(context: Context, attrs: Attribut
     internal fun updateSelected() {
         for (i in 0 until childCount) {
             val view = getChildAt(i) as MonthView
-            view.setSelectedCalendar(mDelegate!!.mSelectedCalendar!!)
+            mDelegate?.mSelectedCalendar?.let {
+                view.setSelectedCalendar(it)
+            }
             view.invalidate()
         }
     }

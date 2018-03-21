@@ -77,9 +77,11 @@ class DefaultWeekView(context: Context) : WeekView(context) {
             }
             else -> {
                 canvas.drawText(calendar.day.toString(), cx.toFloat(), mTextBaseLine + top,
-                        if (calendar.isCurrentDay)
-                            mCurDayTextPaint
-                        else if (calendar.isCurrentMonth) mCurMonthTextPaint else mOtherMonthTextPaint)
+                        when {
+                            calendar.isCurrentDay -> mCurDayTextPaint
+                            calendar.isCurrentMonth -> mCurMonthTextPaint
+                            else -> mOtherMonthTextPaint
+                        })
                 canvas.drawText(calendar.lunar!!, cx.toFloat(), mTextBaseLine + mItemHeight / 10,
                         when {
                             calendar.isCurrentDay -> mCurDayLunarTextPaint

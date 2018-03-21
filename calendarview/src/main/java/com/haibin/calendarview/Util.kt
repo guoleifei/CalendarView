@@ -266,7 +266,7 @@ object Util {
         val maxTime = c.timeInMillis
         c.set(calendar.year, calendar.month - 1, calendar.day)
         val curTime = c.timeInMillis
-        return curTime >= minTime && curTime <= maxTime
+        return curTime in minTime..maxTime
     }
 
     fun isCalendarInRange(calendar: Calendar, delegate: CustomCalendarViewDelegate): Boolean {

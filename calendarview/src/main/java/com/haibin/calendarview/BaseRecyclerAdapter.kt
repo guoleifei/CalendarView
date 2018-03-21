@@ -73,7 +73,7 @@ internal abstract class BaseRecyclerAdapter<T>(context: Context) : RecyclerView.
     }
 
     fun addAll(items: List<T>?) {
-        if (items != null && items.size > 0) {
+        if (items != null && items.isNotEmpty()) {
             mItems.addAll(items)
             notifyItemRangeInserted(mItems.size, items.size)
         }

@@ -140,7 +140,7 @@ class WeekViewPager @JvmOverloads constructor(context: Context, attrs: Attribute
             isUsingScrollToCalendar = false
         }
         setCurrentItem(position, smoothScroll)
-        val view = findViewWithTag<View>(position) as WeekView
+        val view = findViewWithTag<View>(position) as? WeekView
         if (view != null) {
             view.setSelectedCalendar(calendar)
             view.invalidate()

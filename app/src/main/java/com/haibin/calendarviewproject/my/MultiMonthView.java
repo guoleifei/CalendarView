@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.MonthView;
+import com.haibin.calendarview.Scheme;
 import com.haibin.calendarviewproject.base.type.SchemeType;
 
 import java.util.List;
@@ -63,8 +64,8 @@ public class MultiMonthView extends MonthView {
      */
     @Override
     protected boolean onDrawSelected(Canvas canvas, Calendar calendar, int x, int y, boolean hasScheme) {
-        mSelectedPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(x + mPadding, y + mPadding, x + mItemWidth - mPadding, y + mItemHeight - mPadding, mSelectedPaint);
+        getMSelectedPaint().setStyle(Paint.Style.FILL);
+        canvas.drawRect(x + mPadding, y + mPadding, x + getMItemWidth() - mPadding, y + getMItemHeight() - mPadding, getMSelectedPaint());
         return true;
     }
 
@@ -77,30 +78,30 @@ public class MultiMonthView extends MonthView {
      */
     @Override
     protected void onDrawScheme(Canvas canvas, Calendar calendar, int x, int y) {
-        List<Calendar.Scheme> schemes = calendar.getSchemes();
-        for(Calendar.Scheme scheme : schemes){
+        List<Scheme> schemes = calendar.getSchemes();
+        for(Scheme scheme : schemes){
             if(scheme.getType() == SchemeType.TRIGLE.ordinal()){
                 Log.e("pwh","画三角形");
                 Path path=new Path();
-                path.moveTo(x + mItemWidth  - 4 * mRadio,y);
-                path.lineTo(x + mItemWidth ,y  + 4 * mRadio);
-                path.lineTo(x + mItemWidth ,y  );
-                path.moveTo(x + mItemWidth  - 4 * mRadio,y);
+                path.moveTo(x + getMItemWidth()  - 4 * mRadio,y);
+                path.lineTo(x + getMItemWidth() ,y  + 4 * mRadio);
+                path.lineTo(x + getMItemWidth() ,y  );
+                path.moveTo(x + getMItemWidth()  - 4 * mRadio,y);
                 path.close();
                 mSchemeBasicPaint.setColor(scheme.getShcemeColor());
                 canvas.drawPath(path,mSchemeBasicPaint);
-                canvas.drawText(scheme.getScheme(), x + mItemWidth - mPadding - 2 * mRadio, y + mPadding + mSchemeBaseLine , mTextPaint);
+                canvas.drawText(scheme.getScheme(), x + getMItemWidth() - mPadding - 2 * mRadio, y + mPadding + mSchemeBaseLine , mTextPaint);
             }
             else if(scheme.getType() == SchemeType.INDEX.ordinal()){
                 Log.e("pwh","画下标");
                 mSchemeBasicPaint.setColor(scheme.getShcemeColor());
                 float radius = dipToPx(getContext(), 4);
-                canvas.drawCircle(x + mItemWidth / 2,y + mItemHeight - radius  - mPadding,radius,mSchemeBasicPaint);
+                canvas.drawCircle(x + getMItemWidth() / 2,y + getMItemHeight() - radius  - mPadding,radius,mSchemeBasicPaint);
             }
             else if(scheme.getType() == SchemeType.BACKGROUND.ordinal()){
                 Log.e("pwh","画背景色");
                 mSchemeBasicPaint.setColor(scheme.getShcemeColor());
-                canvas.drawRect(x,y,x+mItemWidth,y+mItemHeight,mSchemePaint);
+                canvas.drawRect(x,y,x+getMItemWidth(),y+getMItemHeight(),getMSchemePaint());
             }
 
 
@@ -119,25 +120,25 @@ public class MultiMonthView extends MonthView {
      */
     @Override
     protected void onDrawText(Canvas canvas, Calendar calendar, int x, int y, boolean hasScheme, boolean isSelected) {
-        int cx = x + mItemWidth / 2;
-        int top = y - mItemHeight / 6;
+        int cx = x + getMItemWidth() / 2;
+        int top = y - getMItemHeight() / 6;
 
         if (isSelected) {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    mSelectTextPaint);
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10, mSelectedLunarTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    getMSelectTextPaint());
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + y + getMItemHeight() / 10, getMSelectedLunarTextPaint());
         } else if (hasScheme) {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    calendar.isCurrentMonth() ? mSchemeTextPaint : mOtherMonthTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    calendar.isCurrentMonth() ? getMSchemeTextPaint() : getMOtherMonthTextPaint());
 
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10, mCurMonthLunarTextPaint);
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + y + getMItemHeight() / 10, getMCurMonthLunarTextPaint());
         } else {
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
-                    calendar.isCurrentDay() ? mCurDayTextPaint :
-                            calendar.isCurrentMonth() ? mCurMonthTextPaint : mOtherMonthTextPaint);
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10,
-                    calendar.isCurrentDay() ? mCurDayLunarTextPaint :
-                            calendar.isCurrentMonth() ? mCurMonthLunarTextPaint : mOtherMonthLunarTextPaint);
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, getMTextBaseLine() + top,
+                    calendar.isCurrentDay() ? getMCurDayTextPaint() :
+                            calendar.isCurrentMonth() ? getMCurMonthTextPaint() : getMOtherMonthTextPaint());
+            canvas.drawText(calendar.getLunar(), cx, getMTextBaseLine() + y + getMItemHeight() / 10,
+                    calendar.isCurrentDay() ? getMCurDayLunarTextPaint() :
+                            calendar.isCurrentMonth() ? getMCurMonthLunarTextPaint() : getMOtherMonthLunarTextPaint());
         }
     }
 

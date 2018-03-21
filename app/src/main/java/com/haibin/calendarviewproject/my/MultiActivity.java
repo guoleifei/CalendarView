@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarLayout;
 import com.haibin.calendarview.CalendarView;
+import com.haibin.calendarview.Scheme;
 import com.haibin.calendarviewproject.Article;
 import com.haibin.calendarviewproject.ArticleAdapter;
 import com.haibin.calendarviewproject.R;
@@ -168,7 +169,7 @@ public class MultiActivity extends BaseActivity implements
     }
 
     private Calendar setScheme(Calendar calendar,int color, String text, SchemeType schemeType){
-        Calendar.Scheme scheme = new Calendar.Scheme(schemeType.ordinal(),color,text);
+        Scheme scheme = new Scheme(schemeType.ordinal(),color,text);
         calendar.addScheme(scheme);
         return calendar;
     }

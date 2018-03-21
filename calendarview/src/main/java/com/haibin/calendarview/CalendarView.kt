@@ -98,7 +98,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @return true or false
      */
     val isYearSelectLayoutVisible: Boolean
-        get() = mSelectLayout!!.getVisibility() === View.VISIBLE
+        get() = mSelectLayout?.visibility == View.VISIBLE
 
     /**
      * 获取选择的日期
@@ -120,7 +120,7 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         LayoutInflater.from(context).inflate(R.layout.cv_layout_calendar_view, this, true)
         val frameContent = findViewById<View>(R.id.frameContent) as FrameLayout
         this.mWeekPager = findViewById<View>(R.id.vp_week) as WeekViewPager
-        this.mWeekPager!!.setup(mDelegate)
+        this.mWeekPager?.setup(mDelegate)
 
         if (TextUtils.isEmpty(mDelegate.weekBarClass)) {
             this.mWeekBar = WeekBar(getContext())
@@ -135,32 +135,30 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         }
         frameContent.addView(mWeekBar, 2)
-        mWeekBar!!.setup(mDelegate)
+        mWeekBar?.setup(mDelegate)
 
         this.mWeekLine = findViewById(R.id.line)
-        this.mWeekLine!!.setBackgroundColor(mDelegate.weekLineBackground)
+        this.mWeekLine?.setBackgroundColor(mDelegate.weekLineBackground)
 
         this.mMonthPager = findViewById<View>(R.id.vp_calendar) as MonthViewPager
-        this.mMonthPager!!.mWeekPager = mWeekPager
-        this.mMonthPager!!.mWeekBar = mWeekBar
-        val params = this.mMonthPager!!.getLayoutParams() as FrameLayout.LayoutParams
+        this.mMonthPager?.mWeekPager = mWeekPager
+        this.mMonthPager?.mWeekBar = mWeekBar
+        val params = this.mMonthPager?.layoutParams as FrameLayout.LayoutParams
         params.setMargins(0, mDelegate.weekBarHeight + Util.dipToPx(context, 1f), 0, 0)
-        mWeekPager!!.setLayoutParams(params)
+        mWeekPager?.layoutParams = params
 
         mSelectLayout = findViewById<View>(R.id.selectLayout) as YearSelectLayout
-        mSelectLayout!!.setBackgroundColor(mDelegate.yearViewBackground)
-        mSelectLayout!!.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        mSelectLayout?.setBackgroundColor(mDelegate.yearViewBackground)
+        mSelectLayout?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
 
             }
 
             override fun onPageSelected(position: Int) {
-                if (mWeekPager!!.getVisibility() === View.VISIBLE) {
+                if (mWeekPager?.visibility == View.VISIBLE) {
                     return
                 }
-                if (mDelegate.mYearChangeListener != null) {
-                    mDelegate.mYearChangeListener!!.onYearChange(position + mDelegate.minYear)
-                }
+                mDelegate.mYearChangeListener?.onYearChange(position + mDelegate.minYear)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
@@ -170,46 +168,51 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         mDelegate.mInnerListener = object : OnInnerDateSelectedListener {
             override fun onMonthDateSelected(calendar: Calendar, isClick: Boolean) {
-                if (calendar.year == mDelegate.currentDay!!.year &&
-                        calendar.month == mDelegate.currentDay!!.month
-                        && mMonthPager!!.getCurrentItem() !== mDelegate.mCurrentMonthViewItem) {
-                    return
-                }
-                mDelegate.mSelectedCalendar = calendar
-                mWeekPager!!.updateSelected(mDelegate.mSelectedCalendar!!, false)
-                mMonthPager!!.updateSelected()
-                if (mWeekBar != null) {
-                    mWeekBar!!.onDateSelected(calendar, isClick)
+                if (calendar.year == mDelegate.currentDay?.year &&
+                        calendar.month == mDelegate.currentDay?.month
+                        && mMonthPager?.currentItem != mDelegate.mCurrentMonthViewItem) {
+
+                } else {
+                    mDelegate.mSelectedCalendar = calendar
+                    mDelegate.mSelectedCalendar?.let {
+                        mWeekPager?.updateSelected(it, false)
+                    }
+                    mMonthPager?.updateSelected()
+                    mWeekBar?.onDateSelected(calendar, isClick)
                 }
             }
 
             override fun onWeekDateSelected(calendar: Calendar, isClick: Boolean) {
                 mDelegate.mSelectedCalendar = calendar
                 val y = calendar.year - mDelegate.minYear
-                val position = 12 * y + mDelegate.mSelectedCalendar!!.month - mDelegate.minYearMonth
-                mMonthPager!!.setCurrentItem(position)
-                mMonthPager!!.updateSelected()
-                if (mWeekBar != null) {
-                    mWeekBar!!.onDateSelected(calendar, isClick)
+                mDelegate.mSelectedCalendar?.let {
+                    val position = 12 * y + it.month - mDelegate.minYearMonth
+                    mMonthPager?.currentItem = position
+                    mMonthPager?.updateSelected()
                 }
+                mWeekBar?.onDateSelected(calendar, isClick)
             }
         }
 
         mDelegate.mSelectedCalendar = mDelegate.createCurrentDate()
-        mWeekBar!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
+        mDelegate.mSelectedCalendar?.let {
+            mWeekBar?.onDateSelected(it, false)
+        }
 
-        val mCurYear = mDelegate.mSelectedCalendar!!.year
-        mMonthPager!!.setup(mDelegate)
-        mMonthPager!!.setCurrentItem(mDelegate.mCurrentMonthViewItem)
-        mSelectLayout!!.setOnMonthSelectedListener(object : YearRecyclerView.OnMonthSelectedListener {
+        mMonthPager?.setup(mDelegate)
+        mMonthPager?.currentItem = mDelegate.mCurrentMonthViewItem
+        mSelectLayout?.setOnMonthSelectedListener(object : YearRecyclerView.OnMonthSelectedListener {
             override fun onMonthSelected(year: Int, month: Int) {
                 val position = 12 * (year - mDelegate.minYear) + month - mDelegate.minYearMonth
                 mDelegate.isShowYearSelectedLayout = false
                 closeSelectLayout(position)
             }
         })
-        mSelectLayout!!.setup(mDelegate)
-        mWeekPager!!.updateSelected(mDelegate.mSelectedCalendar!!, false)
+        mSelectLayout?.setup(mDelegate)
+        mDelegate.mSelectedCalendar?.let {
+            mWeekPager?.updateSelected(it, false)
+        }
+
     }
 
     /**
@@ -224,17 +227,17 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
                  maxYear: Int, maxYearMonth: Int) {
         mDelegate.setRange(minYear, minYearMonth,
                 maxYear, maxYearMonth)
-        mWeekPager!!.notifyDataSetChanged()
-        mSelectLayout!!.notifyDataSetChanged()
-        mMonthPager!!.notifyDataSetChanged()
-        if (Util.isCalendarInRange(mDelegate.mSelectedCalendar!!, mDelegate)) {
-            scrollToCalendar(mDelegate.mSelectedCalendar!!.year,
-                    mDelegate.mSelectedCalendar!!.month,
-                    mDelegate.mSelectedCalendar!!.day)
-
-        } else {
-            scrollToCurrent()
+        mWeekPager?.notifyDataSetChanged()
+        mSelectLayout?.notifyDataSetChanged()
+        mMonthPager?.notifyDataSetChanged()
+        mDelegate.mSelectedCalendar?.let {
+            if (Util.isCalendarInRange(it, mDelegate)) {
+                scrollToCalendar(it.year, it.month, it.day)
+            } else {
+                scrollToCurrent()
+            }
         }
+
 
     }
 
@@ -250,45 +253,41 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
     /**
      * 打开日历年月份快速选择
-     * 请使用 showYearSelectLayout(final int year) 代替，这个没什么，越来越规范
+     * 请使用 @link showYearSelectLayout(final int year) 代替，这个没什么，越来越规范
      *
      * @param year 年
      */
     @Deprecated("")
     fun showSelectLayout(year: Int) {
-        if (mParentLayout != null && mParentLayout!!.mContentView != null) {
-            if (!mParentLayout!!.isExpand) {
-                mParentLayout!!.expand()
-                return
-            }
+        if (mParentLayout?.isExpand != true && mParentLayout?.mContentView != null) {
+            mParentLayout?.expand()
+            return
         }
-        mWeekPager!!.setVisibility(View.GONE)
+        mWeekPager?.visibility = View.GONE
         mDelegate.isShowYearSelectedLayout = true
-        if (mParentLayout != null) {
-            mParentLayout!!.hideContentView()
-        }
-        mWeekBar!!.animate()
-                .translationY((-mWeekBar!!.getHeight()).toFloat())
-                .setInterpolator(LinearInterpolator())
-                .setDuration(260)
-                .setListener(object : AnimatorListenerAdapter() {
+        mParentLayout?.hideContentView()
+        mWeekBar?.animate()
+                ?.translationY((-mWeekBar?.height!!).toFloat())
+                ?.setInterpolator(LinearInterpolator())
+                ?.setDuration(260)
+                ?.setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         super.onAnimationEnd(animation)
-                        mWeekBar!!.setVisibility(View.GONE)
-                        mSelectLayout!!.setVisibility(View.VISIBLE)
-                        mSelectLayout!!.scrollToYear(year, false)
-                        if (mParentLayout != null && mParentLayout!!.mContentView != null) {
-                            mParentLayout!!.expand()
+                        mWeekBar?.visibility = View.GONE
+                        mSelectLayout?.visibility = View.VISIBLE
+                        mSelectLayout?.scrollToYear(year, false)
+                        if (mParentLayout != null && mParentLayout?.mContentView != null) {
+                            mParentLayout?.expand()
                         }
                     }
                 })
 
-        mMonthPager!!.animate()
-                .scaleX(0f)
-                .scaleY(0f)
-                .setDuration(260)
-                .setInterpolator(LinearInterpolator())
-                .setListener(object : AnimatorListenerAdapter() {
+        mMonthPager?.animate()
+                ?.scaleX(0f)
+                ?.scaleY(0f)
+                ?.setDuration(260)
+                ?.setInterpolator(LinearInterpolator())
+                ?.setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         super.onAnimationEnd(animation)
                     }
@@ -299,8 +298,11 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * 关闭年月视图选择布局
      */
     fun closeYearSelectLayout() {
-        val position = 12 * (mDelegate.mSelectedCalendar!!.year - mDelegate.minYear) + mDelegate.mSelectedCalendar!!.month - mDelegate.minYearMonth
-        closeSelectLayout(position)
+        mDelegate.mSelectedCalendar?.let {
+            val position = 12 * (it.year - mDelegate.minYear) + it.month - mDelegate.minYearMonth
+            closeSelectLayout(position)
+        }
+
     }
 
     /**
@@ -309,38 +311,37 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @param position 某一年
      */
     private fun closeSelectLayout(position: Int) {
-        mSelectLayout!!.setVisibility(View.GONE)
-        mWeekBar!!.setVisibility(View.VISIBLE)
-        if (position == mMonthPager!!.getCurrentItem()) {
-            if (mDelegate.mDateSelectedListener != null) {
-                mDelegate.mDateSelectedListener!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
+        mSelectLayout?.visibility = View.GONE
+        mWeekBar?.visibility = View.VISIBLE
+        if (position == mMonthPager?.currentItem) {
+            mDelegate.mSelectedCalendar?.let {
+                mDelegate.mDateSelectedListener?.onDateSelected(it, false)
             }
         } else {
-            mMonthPager!!.setCurrentItem(position, false)
+            mMonthPager?.setCurrentItem(position, false)
         }
-        mWeekBar!!.animate()
-                .translationY(0f)
-                .setInterpolator(LinearInterpolator())
-                .setDuration(280)
-                .setListener(object : AnimatorListenerAdapter() {
+        mWeekBar?.animate()
+                ?.translationY(0f)
+                ?.setInterpolator(LinearInterpolator())
+                ?.setDuration(280)
+                ?.setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         super.onAnimationEnd(animation)
-                        mWeekBar!!.setVisibility(View.VISIBLE)
+                        mWeekBar?.visibility = View.VISIBLE
                     }
                 })
-        mMonthPager!!.animate()
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(180)
-                .setInterpolator(LinearInterpolator())
-                .setListener(object : AnimatorListenerAdapter() {
+        mMonthPager?.animate()
+                ?.scaleX(1f)
+                ?.scaleY(1f)
+                ?.setDuration(180)
+                ?.setInterpolator(LinearInterpolator())
+                ?.setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         super.onAnimationEnd(animation)
-                        mMonthPager!!.setVisibility(View.VISIBLE)
-                        mMonthPager!!.clearAnimation()
-                        if (mParentLayout != null) {
-                            mParentLayout!!.showContentView()
-                        }
+                        mMonthPager?.visibility = View.VISIBLE
+                        mMonthPager?.clearAnimation()
+                        mParentLayout?.showContentView()
+
                     }
                 })
     }
@@ -352,14 +353,22 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      */
     @JvmOverloads
     fun scrollToCurrent(smoothScroll: Boolean = false) {
-        if (!Util.isCalendarInRange(mDelegate.currentDay!!, mDelegate)) {
-            return
+        mDelegate.currentDay?.let {
+            if (!Util.isCalendarInRange(it, mDelegate)) {
+                return@scrollToCurrent
+            }
         }
+
         mDelegate.mSelectedCalendar = mDelegate.createCurrentDate()
-        mWeekBar!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
-        mWeekPager!!.scrollToCurrent(smoothScroll)
-        mMonthPager!!.scrollToCurrent(smoothScroll)
-        mSelectLayout!!.scrollToYear(mDelegate.currentDay!!.year, smoothScroll)
+        mDelegate.mSelectedCalendar?.let {
+            mWeekBar?.onDateSelected(it, false)
+        }
+        mWeekPager?.scrollToCurrent(smoothScroll)
+        mMonthPager?.scrollToCurrent(smoothScroll)
+        mDelegate.currentDay?.let {
+            mSelectLayout?.scrollToYear(it.year, smoothScroll)
+        }
+
     }
 
 
@@ -376,10 +385,14 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @param smoothScroll smoothScroll
      */
     fun scrollToNext(smoothScroll: Boolean) {
-        if (mWeekPager!!.getVisibility() === View.VISIBLE) {
-            mWeekPager!!.setCurrentItem(mWeekPager!!.getCurrentItem() + 1, smoothScroll)
+        if (mWeekPager?.visibility == View.VISIBLE) {
+            mWeekPager?.let {
+                it.setCurrentItem(it.currentItem + 1, smoothScroll)
+            }
         } else {
-            mMonthPager!!.setCurrentItem(mMonthPager!!.getCurrentItem() + 1, smoothScroll)
+            mMonthPager?.let {
+                it.setCurrentItem(it.currentItem + 1, smoothScroll)
+            }
         }
 
     }
@@ -397,10 +410,14 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @param smoothScroll smoothScroll
      */
     fun scrollToPre(smoothScroll: Boolean) {
-        if (mWeekPager!!.getVisibility() === View.VISIBLE) {
-            mWeekPager!!.setCurrentItem(mWeekPager!!.getCurrentItem() - 1, smoothScroll)
+        if (mWeekPager?.visibility == View.VISIBLE) {
+            mWeekPager?.let {
+                it.setCurrentItem(it.currentItem - 1, smoothScroll)
+            }
         } else {
-            mMonthPager!!.setCurrentItem(mMonthPager!!.getCurrentItem() - 1, smoothScroll)
+            mMonthPager?.let {
+                it.setCurrentItem(it.currentItem - 1, smoothScroll)
+            }
         }
     }
 
@@ -424,10 +441,10 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @param smoothScroll smoothScroll
      */
     fun scrollToCalendar(year: Int, month: Int, day: Int, smoothScroll: Boolean) {
-        if (mWeekPager!!.getVisibility() === View.VISIBLE) {
-            mWeekPager!!.scrollToCalendar(year, month, day, smoothScroll)
+        if (mWeekPager?.visibility == View.VISIBLE) {
+            mWeekPager?.scrollToCalendar(year, month, day, smoothScroll)
         } else {
-            mMonthPager!!.scrollToCalendar(year, month, day, smoothScroll)
+            mMonthPager?.scrollToCalendar(year, month, day, smoothScroll)
         }
     }
 
@@ -447,8 +464,10 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @param smoothScroll smoothScroll
      */
     fun scrollToYear(year: Int, smoothScroll: Boolean) {
-        mMonthPager!!.setCurrentItem(12 * (year - mDelegate.minYear) + mDelegate.currentDay!!.month - mDelegate.minYearMonth, smoothScroll)
-        mSelectLayout!!.scrollToYear(year, smoothScroll)
+        mDelegate.currentDay?.let {
+            mMonthPager?.setCurrentItem(12 * (year - mDelegate.minYear) + it.month - mDelegate.minYearMonth, smoothScroll)
+        }
+        mSelectLayout?.scrollToYear(year, smoothScroll)
     }
 
 
@@ -477,11 +496,11 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      */
     fun setOnDateSelectedListener(listener: OnDateSelectedListener) {
         this.mDelegate.mDateSelectedListener = listener
-        if (mDelegate.mDateSelectedListener != null) {
-            if (!Util.isCalendarInRange(mDelegate.mSelectedCalendar!!, mDelegate)) {
+        mDelegate.mSelectedCalendar?.let {
+            if (!Util.isCalendarInRange(it, mDelegate)) {
                 return
             }
-            mDelegate.mDateSelectedListener!!.onDateSelected(mDelegate.mSelectedCalendar!!, false)
+            mDelegate.mDateSelectedListener?.onDateSelected(it, false)
         }
     }
 
@@ -501,12 +520,12 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
         super.onAttachedToWindow()
         if (parent != null && parent is CalendarLayout) {
             mParentLayout = parent as CalendarLayout
-            mParentLayout!!.mItemHeight = mDelegate.calendarItemHeight
-            mMonthPager!!.mParentLayout = mParentLayout
-            mWeekPager!!.mParentLayout = mParentLayout
-            mParentLayout!!.mWeekBar = mWeekBar
-            mParentLayout!!.setup(mDelegate)
-            mParentLayout!!.initStatus()
+            mParentLayout?.mItemHeight = mDelegate.calendarItemHeight
+            mMonthPager?.mParentLayout = mParentLayout
+            mWeekPager?.mParentLayout = mParentLayout
+            mParentLayout?.mWeekBar = mWeekBar
+            mParentLayout?.setup(mDelegate)
+            mParentLayout?.initStatus()
         }
     }
 
@@ -518,8 +537,8 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      */
     fun setSchemeDate(mSchemeDate: MutableList<Calendar>) {
         this.mDelegate.mSchemeDate = mSchemeDate
-        mMonthPager!!.updateScheme()
-        mWeekPager!!.updateScheme()
+        mMonthPager?.updateScheme()
+        mWeekPager?.updateScheme()
     }
 
     /**
@@ -530,9 +549,9 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @param lineBg             线的颜色
      */
     fun setBackground(yearViewBackground: Int, weekBackground: Int, lineBg: Int) {
-        mWeekBar!!.setBackgroundColor(weekBackground)
-        mSelectLayout!!.setBackgroundColor(yearViewBackground)
-        mWeekLine!!.setBackgroundColor(lineBg)
+        mWeekBar?.setBackgroundColor(weekBackground)
+        mSelectLayout?.setBackgroundColor(yearViewBackground)
+        mWeekLine?.setBackgroundColor(lineBg)
     }
 
 
@@ -602,8 +621,8 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * @param weekTextColor  字体颜色
      */
     fun setWeeColor(weekBackground: Int, weekTextColor: Int) {
-        mWeekBar!!.setBackgroundColor(weekBackground)
-        mWeekBar!!.setTextColor(weekTextColor)
+        mWeekBar?.setBackgroundColor(weekBackground)
+        mWeekBar?.setTextColor(weekTextColor)
     }
 
 
@@ -612,9 +631,9 @@ class CalendarView @JvmOverloads constructor(context: Context, attrs: AttributeS
      * 重新设置颜色等都需要调用该方法
      */
     fun update() {
-        mSelectLayout!!.update()
-        mMonthPager!!.updateScheme()
-        mWeekPager!!.updateScheme()
+        mSelectLayout?.update()
+        mMonthPager?.updateScheme()
+        mWeekPager?.updateScheme()
     }
 
 

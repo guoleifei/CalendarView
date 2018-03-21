@@ -60,18 +60,28 @@ abstract class MonthView(context: Context) : BaseView(context) {
      * 下个月偏移的数量
      */
     private var mNextDiff: Int = 0
-
-    private// 选择项
-    val index: Calendar?
+    // 选择项
+    private val index: Calendar?
         get() {
-            val width = width / 7
-            var indexX = mX.toInt() / width
-            if (indexX >= 7) {
-                indexX = 6
+            return mItems?.let {
+                val width = width / 7
+                var indexX = mX.toInt() / width
+                if (indexX >= 7) {
+                    indexX = 6
+                }
+                val indexY = mY.toInt() / mItemHeight
+                mCurrentItem = indexY * 7 + indexX
+                if (mCurrentItem >= 0 && mCurrentItem < it.size) it[mCurrentItem] else null
             }
-            val indexY = mY.toInt() / mItemHeight
-            mCurrentItem = indexY * 7 + indexX
-            return if (mCurrentItem >= 0 && mCurrentItem < mItems!!.size) mItems!![mCurrentItem] else null
+//            val width = width / 7
+//            var indexX = mX.toInt() / width
+//            if (indexX >= 7) {
+//                indexX = 6
+//            }
+//            val indexY = mY.toInt() / mItemHeight
+//            mCurrentItem = indexY * 7 + indexX
+//
+//            return if (mCurrentItem >= 0 && mCurrentItem < mItems!!.size) mItems!![mCurrentItem] else null
         }
 
     override fun onDraw(canvas: Canvas) {
@@ -82,27 +92,27 @@ abstract class MonthView(context: Context) : BaseView(context) {
         val count = mLineCount * 7
         var d = 0
         for (i in 0 until mLineCount) {
-            for (j in 0..6) {
-                val calendar = mItems!![d]
-                if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ONLY_CURRENT_MONTH) {
-                    if (d > mItems!!.size - mNextDiff) {
-                        return
+            mItems?.let {
+                for (j in 0..6) {
+                    val calendar = it[d]
+                    if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ONLY_CURRENT_MONTH) {
+                        if (d > it.size - mNextDiff) {
+                            return
+                        }
+                        if (!calendar.isCurrentMonth) {
+                            ++d
+                            continue
+                        }
+                    } else if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_FIT_MONTH) {
+                        if (d >= count) {
+                            return
+                        }
                     }
-                    if (!calendar.isCurrentMonth) {
-                        ++d
-                        continue
-                    }
-                } else if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_FIT_MONTH) {
-                    if (d >= count) {
-                        return
-                    }
+                    draw(canvas, calendar, i, j, d)
+                    ++d
                 }
-                draw(canvas, calendar, i, j, d)
-                ++d
             }
         }
-
-
     }
 
 
@@ -146,40 +156,36 @@ abstract class MonthView(context: Context) : BaseView(context) {
         if (isClick) {
             val calendar = index
             if (calendar != null) {
-
                 if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ONLY_CURRENT_MONTH && !calendar.isCurrentMonth) {
-                    mCurrentItem = mItems!!.indexOf(mDelegate.mSelectedCalendar)
+                    mCurrentItem = mItems?.indexOf(mDelegate.mSelectedCalendar) ?: -1
                     return
                 }
 
                 if (!Util.isCalendarInRange(calendar, mDelegate.minYear,
                                 mDelegate.minYearMonth, mDelegate.maxYear, mDelegate.maxYearMonth)) {
-                    mCurrentItem = mItems!!.indexOf(mDelegate.mSelectedCalendar)
+                    mCurrentItem = mItems?.indexOf(mDelegate.mSelectedCalendar) ?: -1
                     return
                 }
 
-                if (!calendar.isCurrentMonth && mMonthViewPager != null) {
-                    val cur = mMonthViewPager!!.getCurrentItem()
-                    val position = if (mCurrentItem < 7) cur - 1 else cur + 1
-                    mMonthViewPager!!.setCurrentItem(position)
+                if (!(calendar.isCurrentMonth || mMonthViewPager == null)) {
+                    mMonthViewPager?.let {
+                        val cur = it.currentItem
+                        val position = if (mCurrentItem < 7) cur - 1 else cur + 1
+                        it.currentItem = position
+                    }
                 }
-
-                if (mDelegate.mInnerListener != null) {
-                    mDelegate.mInnerListener!!.onMonthDateSelected(calendar, true)
-                }
+                mDelegate.mInnerListener?.onMonthDateSelected(calendar, true)
 
                 if (mParentLayout != null) {
-                    if (calendar.isCurrentMonth) {
-                        mParentLayout!!.setSelectPosition(mItems!!.indexOf(calendar))
-                    } else {
-                        mParentLayout!!.setSelectWeek(Util.getWeekFromDayInMonth(calendar))
+                    mItems?.let {
+                        if (calendar.isCurrentMonth) {
+                            mParentLayout?.setSelectPosition(it.indexOf(calendar))
+                        } else {
+                            mParentLayout?.setSelectWeek(Util.getWeekFromDayInMonth(calendar))
+                        }
                     }
-
                 }
-
-                if (mDelegate.mDateSelectedListener != null) {
-                    mDelegate.mDateSelectedListener!!.onDateSelected(calendar, true)
-                }
+                mDelegate.mDateSelectedListener?.onDateSelected(calendar, true)
                 invalidate()
             }
         }
@@ -192,40 +198,37 @@ abstract class MonthView(context: Context) : BaseView(context) {
             val calendar = index
             if (calendar != null) {
                 if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ONLY_CURRENT_MONTH && !calendar.isCurrentMonth) {
-                    mCurrentItem = mItems!!.indexOf(mDelegate.mSelectedCalendar)
+                    mCurrentItem = mItems?.indexOf(mDelegate.mSelectedCalendar) ?: -1
                     return false
                 }
 
                 if (!Util.isCalendarInRange(calendar, mDelegate.minYear,
                                 mDelegate.minYearMonth, mDelegate.maxYear, mDelegate.maxYearMonth)) {
-                    mCurrentItem = mItems!!.indexOf(mDelegate.mSelectedCalendar)
+                    mCurrentItem = mItems?.indexOf(mDelegate.mSelectedCalendar) ?: -1
                     return false
                 }
 
-                if (!calendar.isCurrentMonth && mMonthViewPager != null) {
-                    val cur = mMonthViewPager!!.getCurrentItem()
-                    val position = if (mCurrentItem < 7) cur - 1 else cur + 1
-                    mMonthViewPager!!.setCurrentItem(position)
-                }
-
-                if (mDelegate.mInnerListener != null) {
-                    mDelegate.mInnerListener!!.onMonthDateSelected(calendar, true)
-                }
-
-                if (mParentLayout != null) {
-                    if (calendar.isCurrentMonth) {
-                        mParentLayout!!.setSelectPosition(mItems!!.indexOf(calendar))
-                    } else {
-                        mParentLayout!!.setSelectWeek(Util.getWeekFromDayInMonth(calendar))
+                if (!calendar.isCurrentMonth) {
+                    mMonthViewPager?.let {
+                        val cur = it.currentItem
+                        val position = if (mCurrentItem < 7) cur - 1 else cur + 1
+                        it.currentItem = position
                     }
 
                 }
+                mDelegate.mInnerListener?.onMonthDateSelected(calendar, true)
 
-                if (mDelegate.mDateSelectedListener != null) {
-                    mDelegate.mDateSelectedListener!!.onDateSelected(calendar, true)
+                if (mParentLayout != null) {
+                    mItems?.let {
+                        if (calendar.isCurrentMonth) {
+                            mParentLayout?.setSelectPosition(it.indexOf(calendar))
+                        } else {
+                            mParentLayout?.setSelectWeek(Util.getWeekFromDayInMonth(calendar))
+                        }
+                    }
                 }
-
-                mDelegate.mDateLongClickListener!!.onDateLongClick(calendar)
+                mDelegate.mDateSelectedListener?.onDateSelected(calendar, true)
+                mDelegate.mDateLongClickListener?.onDateLongClick(calendar)
                 invalidate()
             }
         }
@@ -239,7 +242,7 @@ abstract class MonthView(context: Context) : BaseView(context) {
      * @param calendar calendar
      */
     internal fun setSelectedCalendar(calendar: Calendar) {
-        mCurrentItem = mItems!!.indexOf(calendar)
+        mCurrentItem = mItems?.indexOf(calendar) ?: -1
     }
 
     /**
@@ -252,10 +255,10 @@ abstract class MonthView(context: Context) : BaseView(context) {
         mYear = year
         mMonth = month
         initCalendar()
-        if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ALL_MONTH) {
-            mHeight = mItemHeight * mLineCount
+        mHeight = if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ALL_MONTH) {
+            mItemHeight * mLineCount
         } else {
-            mHeight = Util.getMonthViewHeight(year, month, mItemHeight)
+            Util.getMonthViewHeight(year, month, mItemHeight)
         }
 
     }
@@ -283,24 +286,28 @@ abstract class MonthView(context: Context) : BaseView(context) {
         val size = 42
 
         val preMonthDaysCount: Int
-        if (mMonth == 1) {//如果是1月
-            preYear = mYear - 1
-            preMonth = 12
-            nextYear = mYear
-            nextMonth = mMonth + 1
-            preMonthDaysCount = if (mPreDiff == 0) 0 else Util.getMonthDaysCount(preYear, preMonth)
-        } else if (mMonth == 12) {//如果是12月
-            preYear = mYear
-            preMonth = mMonth - 1
-            nextYear = mYear + 1
-            nextMonth = 1
-            preMonthDaysCount = if (mPreDiff == 0) 0 else Util.getMonthDaysCount(preYear, preMonth)
-        } else {//平常
-            preYear = mYear
-            preMonth = mMonth - 1
-            nextYear = mYear
-            nextMonth = mMonth + 1
-            preMonthDaysCount = if (mPreDiff == 0) 0 else Util.getMonthDaysCount(preYear, preMonth)
+        when (mMonth) {
+            1 -> {//如果是1月
+                preYear = mYear - 1
+                preMonth = 12
+                nextYear = mYear
+                nextMonth = mMonth + 1
+                preMonthDaysCount = if (mPreDiff == 0) 0 else Util.getMonthDaysCount(preYear, preMonth)
+            }
+            12 -> {//如果是12月
+                preYear = mYear
+                preMonth = mMonth - 1
+                nextYear = mYear + 1
+                nextMonth = 1
+                preMonthDaysCount = if (mPreDiff == 0) 0 else Util.getMonthDaysCount(preYear, preMonth)
+            }
+            else -> {//平常
+                preYear = mYear
+                preMonth = mMonth - 1
+                nextYear = mYear
+                nextMonth = mMonth + 1
+                preMonthDaysCount = if (mPreDiff == 0) 0 else Util.getMonthDaysCount(preYear, preMonth)
+            }
         }
         var nextDay = 1
         if (mItems == null)
@@ -308,32 +315,36 @@ abstract class MonthView(context: Context) : BaseView(context) {
         mItems!!.clear()
         for (i in 0 until size) {
             val calendarDate = Calendar()
-            if (i < mPreDiff) {
-                calendarDate.year = preYear
-                calendarDate.month = preMonth
-                calendarDate.day = preMonthDaysCount - mPreDiff + i + 1
-            } else if (i >= mDayCount + mPreDiff) {
-                calendarDate.year = nextYear
-                calendarDate.month = nextMonth
-                calendarDate.day = nextDay
-                ++nextDay
-            } else {
-                calendarDate.year = mYear
-                calendarDate.month = mMonth
-                calendarDate.isCurrentMonth = true
-                calendarDate.day = i - mPreDiff + 1
+            when {
+                i < mPreDiff -> {
+                    calendarDate.year = preYear
+                    calendarDate.month = preMonth
+                    calendarDate.day = preMonthDaysCount - mPreDiff + i + 1
+                }
+                i >= mDayCount + mPreDiff -> {
+                    calendarDate.year = nextYear
+                    calendarDate.month = nextMonth
+                    calendarDate.day = nextDay
+                    ++nextDay
+                }
+                else -> {
+                    calendarDate.year = mYear
+                    calendarDate.month = mMonth
+                    calendarDate.isCurrentMonth = true
+                    calendarDate.day = i - mPreDiff + 1
+                }
             }
             if (calendarDate == mDelegate.currentDay) {
                 calendarDate.isCurrentDay = true
                 mCurrentItem = i
             }
             LunarCalendar.setupLunarCalendar(calendarDate)
-            mItems!!.add(calendarDate)
+            mItems?.add(calendarDate)
         }
-        if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ALL_MONTH) {
-            mLineCount = 6
+        mLineCount = if (mDelegate.monthViewShowMode == CustomCalendarViewDelegate.MODE_ALL_MONTH) {
+            6
         } else {
-            mLineCount = (mPreDiff + mDayCount + mNextDiff) / 7
+            (mPreDiff + mDayCount + mNextDiff) / 7
         }
         if (mDelegate.mSchemeDate != null) {
             for (a in mItems!!) {
@@ -350,7 +361,7 @@ abstract class MonthView(context: Context) : BaseView(context) {
     }
 
 
-     override fun update() {
+    override fun update() {
         if (mDelegate.mSchemeDate != null) {
             for (a in mItems!!) {
                 for (d in mDelegate.mSchemeDate!!) {
@@ -365,17 +376,19 @@ abstract class MonthView(context: Context) : BaseView(context) {
         }
     }
 
-
+    /**
+     * 获取选中的项索引
+     */
     internal fun getSelectedIndex(calendar: Calendar): Int {
-        return mItems!!.indexOf(calendar)
+        return mItems?.indexOf(calendar) ?: -1
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var heightMeasureSpec = heightMeasureSpec
+        var heightMeasureSpecTemp = heightMeasureSpec
         if (mLineCount != 0) {
-            heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(mHeight, View.MeasureSpec.EXACTLY)
+            heightMeasureSpecTemp = View.MeasureSpec.makeMeasureSpec(mHeight, View.MeasureSpec.EXACTLY)
         }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        super.onMeasure(widthMeasureSpec, heightMeasureSpecTemp)
     }
 
     /**
@@ -397,7 +410,7 @@ abstract class MonthView(context: Context) : BaseView(context) {
      * @param x 日历Card x起点坐标
      * @param y 日历Card y起点坐标
      */
-    protected fun onLoopStart(x: Int, y: Int) {
+    open fun onLoopStart(x: Int, y: Int) {
         // TODO: 2017/11/16
     }
 
